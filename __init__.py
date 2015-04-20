@@ -1,2 +1,2 @@
-from tilecodecs.TileCodec import TileCodec
-from tilecodecs.LinearTileCodec import LinearTileCodec
+from TileCodecs.TileCodec import TileCodec
+from TileCodecs.LinearTileCodec import LinearTileCodec
