@@ -14,7 +14,8 @@ class TileCodec:
         
         Arguments:
         bpp - Bits per pixel
-        stride - I have no idea why this exists
+        stride - 0 for MODE_1D, -1 + (# of tile columns in your final image)
+                 for MODE_2D. I have no idea why this exists
         """
         self.bits_per_pixel = bpp
         self.bytes_per_row = bpp # 8 pixel per row / 8 bits per byte
