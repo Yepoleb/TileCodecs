@@ -35,13 +35,14 @@ class TileCodec:
         raise NotImplementedError
         
         
-    def encode(self, pixels, ofs=0):
+    def encode(self, pixels, bits=None, ofs=0):
         """
         Encodes a tile. Has to be implemented by subclasses.
         
         Arguments:
         pixels - A list of decoded tile data
-        ofs - Start offset of tile in tile data
+        bits - A bytearray object to encode the data into
+        ofs - Start offset of tile in bits
         """
         raise NotImplementedError
 

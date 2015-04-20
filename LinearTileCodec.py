@@ -132,11 +132,11 @@ class LinearTileCodec(TileCodec):
         bits - A bytearray object to encode the data into
         ofs - Start offset of tile in bits
         """
-        self.check_bit_length(bits, ofs)
-        
         if bits is None:
             bits = b"\x00" * (self.tile_size)
         bits = bytearray(bits)
+        
+        self.check_bit_length(bits, ofs)
 
         for i_row in range(8):
             # do one row

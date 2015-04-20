@@ -1,2 +1,3 @@
 from TileCodecs.TileCodec import TileCodec
 from TileCodecs.LinearTileCodec import LinearTileCodec
+from TileCodecs._3BPPLinearTileCodec import _3BPPLinearTileCodec
