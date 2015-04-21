@@ -29,9 +29,9 @@ for i in range(0, len(data), codec.getTileSize()):
 
 img = Image.new("RGB", (16,16))
 img.paste(tiles[0], (0,0))
-img.paste(tiles[0], (8,0))
-img.paste(tiles[0], (0,8))
-img.paste(tiles[0], (8,8))
+img.paste(tiles[1], (8,0))
+img.paste(tiles[2], (0,8))
+img.paste(tiles[3], (8,8))
 
 img.save("example.png")
 ```
