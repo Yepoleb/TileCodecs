@@ -12,7 +12,7 @@ Kent Hansen (SnowBro) - He created the original java codecs, which this library 
 from TileCodecs import LinearTileCodec
 from PIL import Image
 
-data = b"\x12\x34\x56\x78" * 8
+data = b"\x12\x34\x56\x78" * 16
 palette = [(0x00, 0x00, 0x00), (0xA0, 0x40, 0x20), (0xD0, 0xA0, 0x50), (0xF0, 0xF0, 0x80)]
 
 codec = LinearTileCodec(2, LinearTileCodec.REVERSE_ORDER)
