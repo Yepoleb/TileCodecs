@@ -1,4 +1,4 @@
-from TileCodecs.TileCodec import TileCodec
+from TileCodecs import TileCodec
 
 """
 Comment from the original Tile Molester Code:
@@ -86,7 +86,7 @@ class LinearTileCodec(TileCodec):
         self.pixel_mask = (1 << self.bits_per_pixel) - 0b1 # e.g. 0b1111 for 4bpp
         
         if ordering is None:
-            ordering = IN_ORDER
+            ordering = self.IN_ORDER
         self.ordering = ordering
 
         if self.ordering == self.IN_ORDER:
@@ -107,7 +107,7 @@ class LinearTileCodec(TileCodec):
         bits - A bytes-like object of encoded tile data 
         ofs - Start offset of tile in bits
         """
-        self.check_bit_length(bits, ofs)
+        self.checkBitsLength(bits, ofs)
         
         pixels = []
         for i_row in range(8):
@@ -137,7 +137,7 @@ class LinearTileCodec(TileCodec):
             bits = b"\x00" * (self.tile_size)
         bits = bytearray(bits)
         
-        self.check_bit_length(bits, ofs)
+        self.checkBitsLength(bits, ofs)
 
         for i_row in range(8):
             # do one row
@@ -148,8 +148,8 @@ class LinearTileCodec(TileCodec):
                 for i_pixel in range(self.startPixel, self.boundary, self.step):
                     # encode one pixel
                     pixel_pos = i_row*8 + i_byte*self.pixels_per_byte + i_pixel
-                    b = b | ((pixels[pixel_pos] & self.pixel_mask) << (
-                            i_pixel*self.bits_per_pixel))
+                    b |= (pixels[pixel_pos] & self.pixel_mask) << \
+                            (i_pixel*self.bits_per_pixel)
                 bits[pos] = b
         
         return bits

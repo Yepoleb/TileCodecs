@@ -5,9 +5,6 @@ class TileCodec:
     decode() and encode().
     """
 
-    MODE_1D=1
-    MODE_2D=2
-
     def __init__(self, bpp, stride=0):
         """
         Base class constructor. Every subclass must call this with argument bpp.
@@ -20,7 +17,7 @@ class TileCodec:
         self.bits_per_pixel = bpp
         self.bytes_per_row = bpp # 8 pixel per row / 8 bits per byte
         self.stride = stride * self.bytes_per_row
-        self.tile_size = (self.bytes_per_row + self.stride) * 8 # 8 rows per tile
+        self.tile_size = self.bytes_per_row * 8 # 8 rows per tile
         self.color_count = 1 << bpp
 
 
@@ -29,9 +26,8 @@ class TileCodec:
         Decodes a tile. Has to be implemented by subclasses.
         
         Arguments:
-        bits - A bytes-like object or int list of encoded tile data 
-               (has to return the value of a byte using the [] operator)
-        ofs - Start offset of tile in bits array
+        bits - A bytes-like object of encoded tile data 
+        ofs - Start offset of tile in bits
         """
         raise NotImplementedError
         
@@ -47,7 +43,7 @@ class TileCodec:
         """
         raise NotImplementedError
 
-    def check_bit_length(self, bits, ofs):
+    def checkBitsLength(self, bits, ofs):
         if len(bits) - ofs < self.tile_size:
             raise IndexError("Bits input too short. Required {}b, got {}b".format(
                     ofs+self.tile_size, len(bits)))

@@ -20,7 +20,7 @@ class _3BPPLinearTileCodec(TileCodec):
         bits - A bytes-like object of encoded tile data 
         ofs - Start offset of tile in bits
         """
-        self.check_bit_length(bits, ofs)
+        self.checkBitsLength(bits, ofs)
         
         pixels = []
         for i_row in range(8):
@@ -54,7 +54,7 @@ class _3BPPLinearTileCodec(TileCodec):
             bits = b"\x00" * (self.tile_size)
         bits = bytearray(bits)
         
-        self.check_bit_length(bits, ofs)
+        self.checkBitLength(bits, ofs)
         
         for i_row in range(8):
             # do one row
