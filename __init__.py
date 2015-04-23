@@ -2,5 +2,5 @@ from TileCodecs.TileCodec import TileCodec
 from TileCodecs.PlanarTileCodec import PlanarTileCodec
 from TileCodecs.LinearTileCodec import LinearTileCodec
 from TileCodecs._3BPPLinearTileCodec import _3BPPLinearTileCodec
-#from TileCodecs.CompositeTileCodec import CompositeTileCodec, PlanarCompositeTileCodec
+from TileCodecs.CompositeTileCodec import CompositeTileCodec, PlanarCompositeTileCodec
 #from TileCodecs.DirectColorTileCodec import DirectColorTileCodec
