@@ -31,7 +31,7 @@ class PlanarTileCodec(TileCodec):
         else:
             raise ValueError("No bpp or bp_offset value given")
         
-        TileCodec.__init__(self, bpp, stride+1)
+        TileCodec.__init__(self, bpp, stride)
         self.bp_offsets = bp_offsets
 
         # Precalculate all bit patterns
@@ -62,7 +62,7 @@ class PlanarTileCodec(TileCodec):
         for i_row in range(8):
             # do one row of pixels
             bp = []
-            pos = ofs + i_row*self.stride
+            pos = ofs + i_row * (self.bytes_per_row + self.stride)
             for i_byte in range(self.bytes_per_row):
                 # get bits for bitplane j
                 bp.append(bits[pos+self.bp_offsets[i_byte]])
@@ -95,7 +95,7 @@ class PlanarTileCodec(TileCodec):
         
         for i_row in range(8):
             # do one row
-            pos = ofs + i_row*self.stride
+            pos = ofs + i_row * (self.bytes_per_row + self.stride)
             for i_byte in range(self.bytes_per_row):
                 # reset bits of bitplane j
                 bits[pos+self.bp_offsets[i_byte]] = 0
