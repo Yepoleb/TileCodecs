@@ -1,5 +1,5 @@
 #TileCodecs
-Python library of ported Tile Molester image codecs. Currently only contains the LinearTileCodec.
+Python library of ported Tile Molester image codecs.
 
 ##Install
 Copy this folder into your project root. (If this repo gets 3 stars, I'll add a proper install script :wink:)
