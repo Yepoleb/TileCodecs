@@ -63,18 +63,18 @@ Pixels: 0     1
 Bits:   3210  7654
 """
 
-class LinearTileCodec(TileCodec):
+class LinearCodec(TileCodec):
     """
     Linear palette-indexed 8x8 tile codec.
     """
 
-    IN_ORDER=1
-    REVERSE_ORDER=2
+    IN_ORDER = 1
+    REVERSE_ORDER = 2
 
     def __init__(self, bpp, ordering=None, stride=0):
         """
-        Constructor for LinearTileCodec
-        
+        Constructor for LinearCodec
+
         Arguments:
         bpp - Bits per pixel
         ordering - See explanation above
@@ -83,42 +83,42 @@ class LinearTileCodec(TileCodec):
         """
         TileCodec.__init__(self, bpp, stride)
         self.pixels_per_byte = 8 // self.bits_per_pixel
-        self.pixel_mask = (1 << self.bits_per_pixel) - 0b1 # e.g. 0b1111 for 4bpp
-        
+        self.pixel_mask = (1 << self.bits_per_pixel) - 1 # e.g. 0b1111 for 4bpp
+
         if ordering is None:
             ordering = self.IN_ORDER
         self.ordering = ordering
 
         if self.ordering == self.IN_ORDER:
-            self.startPixel = self.pixels_per_byte-1
+            self.start_pixel = self.pixels_per_byte-1
             self.boundary = -1
             self.step = -1
 
         else:  # REVERSE_ORDER
-            self.startPixel = 0
+            self.start_pixel = 0
             self.boundary = self.pixels_per_byte
             self.step = 1
 
     def decode(self, bits, ofs=0):
         """
         Decodes a tile.
-        
+
         Arguments:
-        bits - A bytes-like object of encoded tile data 
+        bits - A bytes-like object of encoded tile data
         ofs - Start offset of tile in bits
         """
         self.checkBitsLength(bits, ofs)
-        
+
         pixels = []
         for i_row in range(8):
             # do one row
             for i_byte in range(self.bytes_per_row):
                 # do one byte
-                pos = ofs + i_row*self.bytes_per_row + i_byte*self.stride + i_byte
-                b = bits[pos]
-                for i_pixel in range(self.startPixel, self.boundary, self.step):
+                pos = ofs + i_row*(self.bytes_per_row + self.stride) + i_byte
+                byte = bits[pos]
+                for i_pixel in range(self.start_pixel, self.boundary, self.step):
                     # decode one pixel
-                    pixel = (b >> self.bits_per_pixel*i_pixel) & self.pixel_mask
+                    pixel = (byte >> self.bits_per_pixel*i_pixel) & self.pixel_mask
                     pixels.append(pixel)
 
         return pixels
@@ -127,7 +127,7 @@ class LinearTileCodec(TileCodec):
     def encode(self, pixels, bits=None, ofs=0):
         """
         Encodes a tile.
-        
+
         Arguments:
         pixels - A list of decoded tile data
         bits - A bytearray object to encode the data into
@@ -136,20 +136,20 @@ class LinearTileCodec(TileCodec):
         if bits is None:
             bits = b"\x00" * (self.tile_size)
         bits = bytearray(bits)
-        
+
         self.checkBitsLength(bits, ofs)
 
         for i_row in range(8):
             # do one row
             for i_byte in range(self.bytes_per_row):
                 # do one byte
-                pos = ofs + i_row*self.bytes_per_row + i_byte*self.stride + i_byte
-                b = 0
-                for i_pixel in range(self.startPixel, self.boundary, self.step):
+                pos = ofs + i_row*(self.bytes_per_row + self.stride) + i_byte
+                byte = 0
+                for i_pixel in range(self.start_pixel, self.boundary, self.step):
                     # encode one pixel
                     pixel_pos = i_row*8 + i_byte*self.pixels_per_byte + i_pixel
-                    b |= (pixels[pixel_pos] & self.pixel_mask) << \
+                    byte |= (pixels[pixel_pos] & self.pixel_mask) << \
                             (i_pixel*self.bits_per_pixel)
-                bits[pos] = b
-        
+                bits[pos] = byte
+
         return bits

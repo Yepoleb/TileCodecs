@@ -1,6 +1,6 @@
 from TileCodecs import TileCodec
 
-class PlanarTileCodec(TileCodec):
+class PlanarCodec(TileCodec):
     """
     Planar, palette-indexed 8x8 tile codec. Max. 8 bitplanes.
     Planes for each row must be stored sequentially.
@@ -10,18 +10,18 @@ class PlanarTileCodec(TileCodec):
 
     def __init__(self, bpp=None, bp_offsets=None, stride=0):
         """
-        Creates a planar tile codec. Only one of bpp and bp_offsets can be used.
-        
+        Creates a planar codec. Only one of bpp and bp_offsets can be used.
+
         Arguments:
         bpp - Bits per pixel
-        bp_offsets - Relative offsets for the bitplane values in a row (8 pixels) 
-                     of encoded tile data. The length of this array is the number 
-                     of bitplanes in a tile row, which is equal to the # of bits 
+        bp_offsets - Relative offsets for the bitplane values in a row (8 pixels)
+                     of encoded tile data. The length of this array is the number
+                     of bitplanes in a tile row, which is equal to the # of bits
                      per pixel.
         stride - 0 for MODE_1D, -1 + (# of tile columns in your final image)
                  for MODE_2D. I have no idea why this exists
         """
-        
+
         if (bpp is not None) and (bp_offsets is not None):
             raise ValueError("Only one of bpp or bp_offsets can be given")
         elif bp_offsets is not None:
@@ -30,7 +30,7 @@ class PlanarTileCodec(TileCodec):
             bp_offsets = self.PLANEORDER[:bpp]
         else:
             raise ValueError("No bpp or bp_offset value given")
-        
+
         TileCodec.__init__(self, bpp, stride)
         self.bp_offsets = bp_offsets
 
@@ -50,29 +50,29 @@ class PlanarTileCodec(TileCodec):
     def decode(self, bits, ofs=0):
         """
         Decodes a tile.
-        
+
         Arguments:
-        bits - A bytes-like object of encoded tile data 
+        bits - A bytes-like object of encoded tile data
         ofs - Start offset of tile in bits
         """
         self.checkBitsLength(bits, ofs)
-        
+
         pixels = []
 
         for i_row in range(8):
             # do one row of pixels
-            bp = []
+            bitplane = []
             pos = ofs + i_row * (self.bytes_per_row + self.stride)
             for i_byte in range(self.bytes_per_row):
                 # get bits for bitplane j
-                bp.append(bits[pos+self.bp_offsets[i_byte]])
+                bitplane.append(bits[pos+self.bp_offsets[i_byte]])
 
             for i_pixel in range(8):
                 # decode one pixel
                 pixel = 0
                 for k in range(self.bits_per_pixel):
                     # add bitplane k
-                    pixel |= self.pixels_lookup[k][bp[k]][i_pixel]
+                    pixel |= self.pixels_lookup[k][bitplane[k]][i_pixel]
                 pixels.append(pixel)
 
         return pixels
@@ -81,7 +81,7 @@ class PlanarTileCodec(TileCodec):
     def encode(self, pixels, bits=None, ofs=0):
         """
         Encodes a bitplaned tile.
-        
+
         Arguments:
         pixels - A list of decoded tile data
         bits - A bytearray object to encode the data into
@@ -90,9 +90,9 @@ class PlanarTileCodec(TileCodec):
         if bits is None:
             bits = b"\x00" * (self.tile_size)
         bits = bytearray(bits)
-        
+
         self.checkBitsLength(bits, ofs)
-        
+
         for i_row in range(8):
             # do one row
             pos = ofs + i_row * (self.bytes_per_row + self.stride)
@@ -108,5 +108,5 @@ class PlanarTileCodec(TileCodec):
                     # add bitplane k
                     bits[pos+self.bp_offsets[k]] |= ((pixel >> k) & 0x01) << \
                             (7-i_pixel)
-        
+
         return bits

@@ -1,14 +1,14 @@
-class TileCodec:
+class TileCodec(object):
     """
     Abstract class for 8x8 ("atomic") tile codecs.
-    To add a new tile format, simply extend this class and implement 
+    To add a new tile format, simply extend this class and implement
     decode() and encode().
     """
 
     def __init__(self, bpp, stride=0):
         """
         Base class constructor. Every subclass must call this with argument bpp.
-        
+
         Arguments:
         bpp - Bits per pixel
         stride - 0 for MODE_1D, -1 + (# of tile columns in your final image)
@@ -24,18 +24,18 @@ class TileCodec:
     def decode(self, bits, ofs=0):
         """
         Decodes a tile. Has to be implemented by subclasses.
-        
+
         Arguments:
-        bits - A bytes-like object of encoded tile data 
+        bits - A bytes-like object of encoded tile data
         ofs - Start offset of tile in bits
         """
         raise NotImplementedError
-        
-        
+
+
     def encode(self, pixels, bits=None, ofs=0):
         """
         Encodes a tile. Has to be implemented by subclasses.
-        
+
         Arguments:
         pixels - A list of decoded tile data
         bits - A bytearray object to encode the data into
@@ -44,9 +44,12 @@ class TileCodec:
         raise NotImplementedError
 
     def checkBitsLength(self, bits, ofs):
+        """
+        Checks if the amount of remaining pixels is bigger than the tilesize.
+        """
         if len(bits) - ofs < self.tile_size:
-            raise IndexError("Bits input too short. Required {}b, got {}b".format(
-                    ofs+self.tile_size, len(bits)))
+            raise IndexError("Bits input too short. Required {}b, got {}b"\
+                .format(ofs+self.tile_size, len(bits)))
 
     def getBitsPerPixel(self):
         """

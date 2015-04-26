@@ -1,14 +1,36 @@
 from TileCodecs import TileCodec
 
-class DirectColorTileCodec(TileCodec):
+def msb(mask):
+    """
+    Gets the position of the most significant set bit in the given int.
+    """
+    for i in reversed(range(32)):
+        if (mask & 0x80000000) != 0:
+            return i
+        mask <<= 1
+
+    return -1  # no bits set
+
+
+def getByteIntegralBitCount(bpp):
+    """
+    Gets the least number of whole bytes that are required to store
+    <bpp> bits of information.
+    """
+    if (bpp % 8) != 0:
+        return bpp - bpp % 8 + 8
+    else:
+        return bpp
+
+class DirectColorCodec(TileCodec):
     """
     16, 24, and 32-bit direct-color (ARGB) tile codec.
     # of bits per color component must not exceed 8.
     The color component masks must be directly adjacent.
     """
 
-    LITTLE_ENDIAN=1
-    BIG_ENDIAN=2
+    LITTLE_ENDIAN = 1
+    BIG_ENDIAN = 2
 
     # Predefined masks
     MASK_15BPP_RGB_555 = [0x7C00, 0x03E0, 0x001F]
@@ -29,7 +51,7 @@ class DirectColorTileCodec(TileCodec):
     def __init__(self, bpp, masks, endianness=LITTLE_ENDIAN, stride=0):
         """
         Creates a direct-color tile codec.
-        
+
         Arguments:
         bpp - Bits per pixel
         endianness - Either LITTLE_ENDIAN or BIG_ENDIAN
@@ -39,22 +61,22 @@ class DirectColorTileCodec(TileCodec):
         stride - 0 for MODE_1D, -1 + (# of tile columns in your final image)
                  for MODE_2D. I have no idea why this exists
         """
-        TileCodec.__init__(self, self.getByteIntegralBitCount(bpp), stride)
+        TileCodec.__init__(self, getByteIntegralBitCount(bpp), stride)
         self.bytes_per_pixel = self.bits_per_pixel // 8   # 2, 3 or 4
-        
+
         if len(masks) < 3:
             raise ValueError("Mask needs to have at least 3 values, got {}"\
-                    .format(len(mask)))
+                    .format(len(masks)))
         elif len(masks) == 3:
             masks.append(0)
         self.masks = masks
 
         # calculate the shifts
         self.shifts = (
-                23 - self.msb(self.masks[0]),
-                15 - self.msb(self.masks[1]),
-                7  - self.msb(self.masks[2]),
-                31 - self.msb(self.masks[3]))
+            23 - msb(self.masks[0]),
+            15 - msb(self.masks[1]),
+            7  - msb(self.masks[2]),
+            31 - msb(self.masks[3]))
 
         self.setEndianness(endianness)
 
@@ -64,7 +86,7 @@ class DirectColorTileCodec(TileCodec):
         Sets the endianness.
         """
         self.endianness = endianness
-        if (endianness == self.LITTLE_ENDIAN):
+        if endianness == self.LITTLE_ENDIAN:
             self.start_shift = 0
             self.shift_step = 8
         else: # BIG_ENDIAN
@@ -72,41 +94,18 @@ class DirectColorTileCodec(TileCodec):
             self.shift_step = -8
 
 
-    def msb(self, mask):
-        """
-        Gets the position of the most significant set bit in the given int.
-        """
-        for i in reversed(range(32)):
-            if ((mask & 0x80000000) != 0):
-                return i
-            mask <<= 1
-
-        return -1  # no bits set
-
-
-    def getByteIntegralBitCount(self, bpp):
-        """
-        Gets the least number of whole bytes that are required to store
-        <bpp> bits of information.
-        """
-        if (bpp % 8) != 0:
-            return bpp - bpp % 8 + 8
-        else:
-            return bpp
-
-
     def decode(self, bits, ofs=0):
         """
         Decodes a tile. Has to be implemented by subclasses.
-        
+
         Arguments:
-        bits - A bytes-like object of encoded tile data 
+        bits - A bytes-like object of encoded tile data
         ofs - Start offset of tile in bits
         """
         self.checkBitsLength(bits, ofs)
-        
+
         pixels = []
-        
+
         for i_row in range(8):
             # do one row of pixels
             for i_pixel in range(8):
@@ -114,8 +113,8 @@ class DirectColorTileCodec(TileCodec):
                 pixel_bytes = 0
                 for i_byte in range(self.bytes_per_pixel):
                     shift = (self.start_shift + i_byte*self.shift_step)
-                    pos = (ofs + (i_row*8 + i_pixel) * self.bytes_per_pixel + 
-                            self.stride*i_row + i_byte)
+                    pos = (ofs + (i_row*8 + i_pixel) * self.bytes_per_pixel +
+                        self.stride*i_row + i_byte)
                     pixel_bytes |= bits[pos] << shift
 
                 pixel = 0
@@ -129,7 +128,7 @@ class DirectColorTileCodec(TileCodec):
                         color <<= shift
 
                     pixel |= color
-                    
+
                 pixels.append(pixel)
 
         return pixels
@@ -138,7 +137,7 @@ class DirectColorTileCodec(TileCodec):
     def encode(self, pixels, bits=None, ofs=0):
         """
         Encodes a tile.
-        
+
         Arguments:
         pixels - A list of decoded tile data
         bits - A bytearray object to encode the data into
@@ -147,7 +146,7 @@ class DirectColorTileCodec(TileCodec):
         if bits is None:
             bits = b"\x00" * (self.tile_size)
         bits = bytearray(bits)
-        
+
         self.checkBitsLength(bits, ofs)
 
         for i_row in range(8):
@@ -155,7 +154,7 @@ class DirectColorTileCodec(TileCodec):
             for i_pixel in range(8):
                 # get decoded pixel
                 pixel_pos = i_row * 8 + i_pixel
-                
+
                 argb = pixels[pixel_pos]
                 bin_pixel = 0
 
@@ -171,8 +170,8 @@ class DirectColorTileCodec(TileCodec):
                 # final value
                 for i_byte in range(self.bytes_per_pixel):
                     shift = (self.start_shift + i_byte*self.shift_step)
-                    pos = (ofs + (i_row*8 + i_pixel) * self.bytes_per_pixel + 
-                            self.stride*i_row + i_byte)
+                    pos = (ofs + (i_row*8 + i_pixel) * self.bytes_per_pixel +
+                        self.stride*i_row + i_byte)
                     bits[pos] = (bin_pixel >> shift) & 0xFF
 
         return bits
