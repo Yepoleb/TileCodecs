@@ -9,7 +9,7 @@ Kent Hansen (SnowBro) - He created the original java codecs, which this library 
 
 ##Example
 ```python
-from TileCodecs import LinearCodec
+from tilecodecs import LinearCodec
 from PIL import Image
 
 data = b"\x12\x34\x56\x78" * 16

@@ -1,4 +1,4 @@
-from TileCodecs import TileCodec
+from tilecodecs import TileCodec
 
 class _3BPPLinearCodec(TileCodec):
     """

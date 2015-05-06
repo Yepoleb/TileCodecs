@@ -1,5 +1,5 @@
-from TileCodecs import TileCodec
-from TileCodecs import PlanarCodec
+from tilecodecs import TileCodec
+from tilecodecs import PlanarCodec
 
 """
 Comment from the original Tile Molester Code:

@@ -1,4 +1,4 @@
-from TileCodecs import TileCodec
+from tilecodecs import TileCodec
 
 """
 Comment from the original Tile Molester Code:

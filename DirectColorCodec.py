@@ -1,4 +1,4 @@
-from TileCodecs import TileCodec
+from tilecodecs import TileCodec
 
 def msb(mask):
     """
