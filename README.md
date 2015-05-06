@@ -1,8 +1,9 @@
 #TileCodecs
-Python library of ported Tile Molester image codecs.
+Python library for decoding retro console images. The codecs are ported from Tile Molester.
 
-##Install
-Copy this folder into your project root. (If this repo gets 3 stars, I'll add a proper install script :wink:)
+##Installation
+Clone and run
+`# python3 setup.py install`
 
 ##Credits
 Kent Hansen (SnowBro) - He created the original java codecs, which this library is based on.
@@ -35,4 +36,5 @@ img.paste(tiles[3], (8,8))
 
 img.save("example.png")
 ```
+
 
