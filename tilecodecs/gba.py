@@ -128,12 +128,12 @@ def tile_image(raw, alpha=False):
     tile.putdata(raw)
     return tile
 
-def iter_tile_images(raw):
+def iter_tile_images(raw, alpha=False):
     """
     Creates Images for multiple tiles
     """
     for raw_tile in raw:
-        yield tile_image(raw_tile)
+        yield tile_image(raw_tile, alpha)
 
 def combine_tiles(tiles, width):
     """
