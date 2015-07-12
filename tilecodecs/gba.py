@@ -19,7 +19,7 @@ def decode_color(color, alpha=False):
     b = ((color >> 10) & 0b11111) << 3
 
     if alpha:
-        return (r, g, g, 255)
+        return (r, g, b, 255)
     else:
         return (r, g, b)
 
@@ -116,11 +116,11 @@ def iter_color_tiles(tiles, palette):
     for tile in tiles:
         yield color_tile(tile, palette)
 
-def tile_image(raw, alpha=False):
+def tile_image(raw):
     """
     Creates a PIL Image from a colored tile
     """
-    if alpha:
+    if len(raw[0]) == 4:
         mode = "RGBA"
     else:
         mode = "RGB"
@@ -128,12 +128,12 @@ def tile_image(raw, alpha=False):
     tile.putdata(raw)
     return tile
 
-def iter_tile_images(raw, alpha=False):
+def iter_tile_images(raw):
     """
     Creates Images for multiple tiles
     """
     for raw_tile in raw:
-        yield tile_image(raw_tile, alpha)
+        yield tile_image(raw_tile)
 
 def combine_tiles(tiles, width):
     """
